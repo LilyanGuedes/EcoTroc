@@ -7,6 +7,11 @@ export class User {
     public email: string,
     public password: string,
     public role: RoleReference,
-    public ecopointId?: string, // Só para operadores
+    public ecopointId?: string,
+    public pointsBalance: number = 0,
   ) {}
+
+  addPoints(points: number) {
+    this.pointsBalance += points;
+  }
 }

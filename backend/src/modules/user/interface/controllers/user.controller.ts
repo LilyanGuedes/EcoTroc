@@ -1,19 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { RegisterUserDto } from '../../application/dto/register-user.dto';
 import { RegisterUserUseCase } from '../../application/use-cases/rigester-user.use-case';
 import { UserRepository } from '../../infrastructure/repositories/user.repository';
 
 @Controller('users')
 export class UserController {
-  private readonly registerUserUseCase: RegisterUserUseCase;
-
-  constructor(private readonly userRepository: UserRepository) {
-    this.registerUserUseCase = new RegisterUserUseCase(userRepository);
-  }
+  constructor(private readonly repo: UserRepository) {}
 
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterUserDto) {
-    const user = await this.registerUserUseCase.execute(dto);
-    return user;
+    const uc = new RegisterUserUseCase(this.repo);
+    const user = await uc.execute(dto);
+    return { id: user.id, name: user.name, email: user.email, role: user.role };
   }
 }

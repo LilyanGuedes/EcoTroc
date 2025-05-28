@@ -1,14 +1,9 @@
 export class Email {
   constructor(private readonly value: string) {
-    if (!this.isValidEmail(value)) {
-      throw new Error('Invalid email');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      throw new Error('Invalid email format');
     }
   }
-
-  private isValidEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
   getValue(): string {
     return this.value;
   }

@@ -1,27 +1,26 @@
+import { v4 as uuid } from 'uuid';
+import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '../../domain/repositories/user.repository.interface';
 import { RegisterUserDto } from '../dto/register-user.dto';
 import { User } from '../../domain/entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
-import { RoleReference } from 'src/shared/domain/role-reference.enum';
+import { Email } from '../../domain/value-objects/email.vo';
 
 export class RegisterUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(private readonly repo: IUserRepository) {}
 
   async execute(dto: RegisterUserDto): Promise<User> {
-    const existing = await this.userRepository.findByEmail(dto.email);
-    if (existing) {
-      throw new Error('User already exists');
-    }
+    const existing = await this.repo.findByEmail(dto.email);
+    if (existing) throw new Error('Email already in use');
 
+    const hashed = await bcrypt.hash(dto.password, 10);
     const user = new User(
-      uuidv4(),
+      uuid(),
       dto.name,
-      dto.email,
-      dto.password, // Você pode aplicar hash aqui
+      new Email(dto.email).getValue(),
+      hashed,
       dto.role,
-      dto.role === RoleReference.ECOOPERATOR ? dto.ecopointId : undefined,
+      dto.ecopointId,
     );
-
-    return this.userRepository.create(user);
+    return this.repo.create(user);
   }
 }
