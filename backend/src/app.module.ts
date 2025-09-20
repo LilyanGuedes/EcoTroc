@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { config } from 'dotenv';
 import { AuthModule } from './modules/auth/auth.module';
+import { CollectionModule } from './modules/collection/collection.module';
 
 config();
 
@@ -21,7 +22,8 @@ config();
       synchronize: true,
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    CollectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

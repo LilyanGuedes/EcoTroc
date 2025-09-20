@@ -1,0 +1,42 @@
+<div class="relative min-h-screen overflow-hidden">
+  <!-- Imagem de fundo -->
+  <img
+    class="fixed top-0 left-0 w-full h-full object-cover z-0"
+    src="../../../assets/present.jpg"
+    alt="Background"
+  >
+
+  <div class="relative z-10 flex flex-col min-h-screen items-center justify-between py-8">
+    <!-- Logo no topo -->
+    <div class="mt-8">
+      <img 
+        src="../../../assets/logo.png" 
+        alt="Logo"
+        class="w-56 h-auto"
+      >
+    </div>
+
+    <!-- Botão Começar na parte inferior -->
+    <div class="mb-2 w-full px-4 space-y-4 max-w-xs mx-auto">
+      <!-- Botão Começar (verde) -->
+      <button 
+        mat-raised-button 
+        color="primary"
+        class="w-full !bg-green-600 hover:!bg-green-700 !text-white !py-3 !text-lg !font-bold !rounded-full !shadow-lg"
+        routerLink="/register-user"
+      >
+        Começar >
+      </button>
+
+      <!-- Botão "Já tenho conta" (outline branco) -->
+      <button 
+        mat-stroked-button
+        class="w-full !border-white !text-white hover:!bg-white/10 !py-3 !text-lg !font-medium !rounded-full"
+        routerLink="login"
+
+      >
+        Já tenho conta
+      </button>
+    </div>
+  </div>
+</div>

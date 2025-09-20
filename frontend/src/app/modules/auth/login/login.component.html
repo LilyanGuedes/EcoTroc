@@ -1,0 +1,93 @@
+<div class="relative min-h-screen overflow-hidden p-4">
+<div class="flex w-full justify-center mt-10">
+  <img 
+    src="../../../assets/logo.png" 
+    alt="Logo"
+    class="w-40 h-auto"
+  >
+</div>
+
+<div class="w-full">
+  <div class="mt-8 text-3xl font-bold leading-tight tracking-tight text-gray-700">
+    Entrar
+  </div>
+  <div class="mt-2 text-gray-600">
+    Você precisa de uma conta para continuar
+  </div>
+</div>
+
+<form
+  [formGroup]="formGroup"
+  (ngSubmit)="submit()"
+  class="mt-8 w-full space-y-4"
+>
+  <!-- Campo Celular (Material com fundo transparente) -->
+  <mat-form-field appearance="outline" class="w-full !bg-transparent">
+    <input
+      matInput
+      formControlName="cellphone"
+      placeholder="(00) 0 0000-0000"
+      class="placeholder-gray-400"
+      autocomplete="tel"
+    >
+    <mat-icon matSuffix class="text-gray-500">phone</mat-icon>
+    <mat-error class="text-red-500 text-sm">
+      Celular é obrigatório
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Campo Senha (Material com fundo transparente) -->
+  <mat-form-field appearance="outline" class="w-full !bg-transparent">
+    <input
+      matInput
+      [type]="hidePassword ? 'password' : 'text'"
+      formControlName="password"
+      placeholder="**********"
+      class="placeholder-gray-400"
+      autocomplete="current-password"
+    >
+    <button
+      type="button"
+      mat-icon-button
+      matSuffix
+      (click)="hidePassword = !hidePassword"
+      class="text-gray-500"
+    >
+      <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+    </button>
+    <mat-error class="text-red-500 text-sm">
+      Senha é obrigatória
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Botão Entrar (Material) -->
+<button
+  mat-raised-button
+  type="submit"
+  class="w-full py-2 text-lg font-medium mat-green-button"
+  [disabled]="!formGroup.valid"
+>
+  Entrar
+</button>
+</form>
+
+<div class="mt-8 flex flex-col items-center w-full space-y-4">
+  <!-- Divisor -->
+  <div class="flex items-center gap-3 w-full">
+    <div class="flex-grow border-t border-gray-300"></div>
+    <span class="text-sm text-gray-500 whitespace-nowrap px-2">
+      Ainda não tem uma conta?
+    </span>
+    <div class="flex-grow border-t border-gray-300"></div>
+  </div>
+      <span class="text-sm text-gray-500 whitespace-nowrap px-2">
+      Inscreva-se como
+    </span>
+<div class="flex gap-2 w-full justify-center items-center">
+  <a href="" class="text-green-800 underline hover:text-green-900">EcoOperador</a>
+  <span class="text-gray-500">ou</span>
+  <a href="" class="text-green-800 underline hover:text-green-900">Reciclador</a>
+</div>
+</div>
+
+</div>

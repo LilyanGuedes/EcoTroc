@@ -2,11 +2,12 @@ import { CreateCollectionDto } from '../dto/create-collection.dto';
 import { Collection } from '../../domain/entities/collection.entity';
 import { ICollectionRepository } from '../../domain/repositories/collection.repository.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { IUserPointsRepository } from 'src/modules/user-points/domain/repositories/user-points.repository.interface';
 
 export class CreateCollectionUseCase {
   constructor(
     private readonly collectionRepo: ICollectionRepository,
-    private readonly userPointsRepo: any, // will be injected from PointsModule
+    private readonly userPointsRepo: IUserPointsRepository, // will be injected from PointsModule
   ) {}
 
   async execute(dto: CreateCollectionDto): Promise<void> {
