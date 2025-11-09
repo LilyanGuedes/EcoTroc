@@ -4,11 +4,15 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 export class CollectionOrmEntity {
   @PrimaryColumn('uuid') id: string;
   @Column() operatorId: string;
-  @Column() recyclerNickname: string;
+  @Column() userId: string;
   @Column() materialType: string;
   @Column('int') quantity: number;
   @Column('int') points: number;
   @Column({ type: 'timestamp' }) createdAt: Date;
-  @Column({ type: 'timestamp', nullable: true }) receivedAt?: Date;
-  @Column({ default: false }) received: boolean;
+  @Column({ type: 'timestamp', nullable: true }) respondedAt?: Date;
+  @Column({
+    type: 'varchar',
+    default: 'pending'
+  }) status: string;
+  @Column({ nullable: true }) description?: string;
 }

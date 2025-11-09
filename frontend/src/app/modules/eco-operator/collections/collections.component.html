@@ -1,0 +1,66 @@
+<div class="min-h-screen bg-gradient-to-br from-emerald-400 via-green-400 to-teal-500 p-6">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <button (click)="goBack()" mat-icon-button class="!bg-white/20 !text-white hover:!bg-white/30">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-bold text-white">Coletas Declaradas</h1>
+    <button (click)="declareNew()" mat-icon-button class="!bg-white/20 !text-white hover:!bg-white/30">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="flex justify-center items-center py-12">
+    <mat-icon class="animate-spin text-white text-5xl">refresh</mat-icon>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && collections().length === 0" class="text-center py-12">
+    <mat-icon class="text-white text-6xl mb-4">inventory_2</mat-icon>
+    <p class="text-white text-lg mb-4">Nenhuma coleta declarada ainda</p>
+    <button mat-raised-button color="accent" (click)="declareNew()">
+      <mat-icon>add</mat-icon>
+      Declarar Reciclagem
+    </button>
+  </div>
+
+  <!-- Collections List -->
+  <div class="grid gap-4 max-w-4xl mx-auto">
+    <mat-card *ngFor="let collection of collections()" class="!bg-white/95">
+      <mat-card-header>
+        <mat-icon mat-card-avatar [class]="'!bg-green-500 !text-white'">
+          {{ getMaterialIcon(collection.materialType) }}
+        </mat-icon>
+        <mat-card-title>{{ getMaterialLabel(collection.materialType) }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ collection.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="!mt-4">
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Quantidade:</span>
+            <span class="font-semibold">{{ collection.quantity }} kg</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Pontos:</span>
+            <span class="font-semibold text-green-600">{{ collection.points }} pts</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Status:</span>
+            <mat-chip [color]="getStatusColor(collection.status)">
+              {{ getStatusLabel(collection.status) }}
+            </mat-chip>
+          </div>
+          <div *ngIf="collection.description" class="pt-2 border-t">
+            <span class="text-gray-600">Descrição:</span>
+            <p class="text-sm mt-1">{{ collection.description }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
