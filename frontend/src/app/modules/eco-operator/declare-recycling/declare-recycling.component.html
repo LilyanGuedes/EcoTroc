@@ -1,0 +1,155 @@
+<div class="min-h-screen bg-green-700">
+  <!-- Top Navigation - Fixed Header -->
+  <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-md px-4 py-3">
+    <div class="flex w-full justify-between items-center">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon class="text-gray-700">arrow_back</mat-icon>
+      </button>
+      <img src="../../../assets/logo.png" alt="Logo EcoTroc" class="h-20" />
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-white">
+          {{ (currentUser$ | async)?.name?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+      </button>
+    </div>
+    <mat-menu #userMenu="matMenu">
+      <div class="px-4 py-3 border-b bg-gray-50" *ngIf="currentUser$ | async as user">
+        <p class="font-semibold text-gray-800">{{ user.name }}</p>
+        <p class="text-sm text-gray-600">{{ user.email }}</p>
+        <p class="text-xs text-gray-500 mt-1">Eco-Operador</p>
+      </div>
+      <button mat-menu-item routerLink="/operator/home">
+        <mat-icon class="text-green-600">home</mat-icon>
+        <span>Início</span>
+      </button>
+      <button mat-menu-item routerLink="/operator/declare">
+        <mat-icon class="text-green-600">recycling</mat-icon>
+        <span>Declarar Reciclagem</span>
+      </button>
+      <button mat-menu-item routerLink="/operator/collections">
+        <mat-icon class="text-blue-600">pending_actions</mat-icon>
+        <span>Coletas</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()" class="text-red-600">
+        <mat-icon class="text-red-600">logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </mat-menu>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-lg mx-auto px-4 py-6">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-white drop-shadow-lg">Declarar Reciclagem</h1>
+      <p class="text-sm text-white font-bold drop-shadow-md mt-2">Registre a coleta de materiais recicláveis</p>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl p-6">
+      <form [formGroup]="formGroup" (ngSubmit)="submit()" class="space-y-6">
+        <!-- Selecione o Reciclador -->
+        <div class="w-full">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Selecione o Reciclador</label>
+          <div class="relative">
+            <input
+              type="text"
+              formControlName="userSearch"
+              placeholder="Digite o nome ou email"
+              [matAutocomplete]="auto"
+              class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:outline-none transition-colors"
+            />
+            <mat-icon class="absolute right-3 top-3 text-gray-400">person_search</mat-icon>
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onRecyclerSelected($event.option.value)">
+              <mat-option *ngFor="let recycler of filteredRecyclers()" [value]="recycler">
+                <div class="flex items-center gap-2">
+                  <mat-icon>account_circle</mat-icon>
+                  <div>
+                    <div class="font-medium">{{ recycler.name }}</div>
+                    <div class="text-sm text-gray-500">{{ recycler.email }}</div>
+                  </div>
+                </div>
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+          <div class="text-red-600 text-sm mt-1 ml-1" *ngIf="formGroup.get('userId')?.invalid && formGroup.get('userId')?.touched">
+            <span *ngIf="formGroup.get('userId')?.hasError('required')">Selecione um reciclador</span>
+          </div>
+        </div>
+
+        <!-- Tipo de Material -->
+        <div class="w-full">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Material</label>
+          <div class="relative">
+            <select
+              formControlName="materialType"
+              class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:outline-none transition-colors appearance-none bg-white"
+            >
+              <option value="" disabled selected>Selecione o material</option>
+              <option *ngFor="let material of materials" [value]="material.value">
+                {{ material.label }} ({{ material.pointsPerUnit }} pts/kg)
+              </option>
+            </select>
+            <mat-icon class="absolute right-3 top-3 text-gray-400 pointer-events-none">recycling</mat-icon>
+          </div>
+          <div class="text-red-600 text-sm mt-1 ml-1" *ngIf="formGroup.get('materialType')?.invalid && formGroup.get('materialType')?.touched">
+            <span *ngIf="formGroup.get('materialType')?.hasError('required')">Tipo de material é obrigatório</span>
+          </div>
+        </div>
+
+        <!-- Quantidade -->
+        <div class="w-full">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Quantidade (kg)</label>
+          <div class="relative">
+            <input
+              type="number"
+              formControlName="quantity"
+              placeholder="0.0"
+              step="0.1"
+              min="0.1"
+              class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:outline-none transition-colors"
+            />
+            <mat-icon class="absolute right-3 top-3 text-gray-400">scale</mat-icon>
+          </div>
+          <div class="text-red-600 text-sm mt-1 ml-1" *ngIf="formGroup.get('quantity')?.invalid && formGroup.get('quantity')?.touched">
+            <span *ngIf="formGroup.get('quantity')?.hasError('required')">Quantidade é obrigatória</span>
+            <span *ngIf="formGroup.get('quantity')?.hasError('min')">Quantidade mínima é 0.1 kg</span>
+          </div>
+        </div>
+
+        <!-- Descrição -->
+        <div class="w-full">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição (opcional)</label>
+          <div class="relative">
+            <textarea
+              formControlName="description"
+              rows="3"
+              placeholder="Observações sobre a coleta"
+              class="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-xl focus:border-green-600 focus:outline-none transition-colors resize-none"
+            ></textarea>
+            <mat-icon class="absolute right-3 top-3 text-gray-400">description</mat-icon>
+          </div>
+        </div>
+
+        <!-- Pontos Estimados -->
+        <div *ngIf="estimatedPoints() > 0" class="bg-green-100 border-2 border-green-400 rounded-xl p-4 text-center">
+          <p class="text-lg font-semibold text-green-800">
+            Pontos Estimados: {{ estimatedPoints() }} pts
+          </p>
+          <p class="text-sm text-green-600 mt-1">
+            Aguardando aprovação do reciclador
+          </p>
+        </div>
+
+        <!-- Botão Submit -->
+        <button
+          type="submit"
+          [disabled]="formGroup.invalid || loading()"
+          class="w-full bg-green-700 hover:bg-green-800 text-white py-3 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <mat-icon>check_circle</mat-icon>
+          <span>{{ loading() ? 'Declarando...' : 'Declarar Reciclagem' }}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
