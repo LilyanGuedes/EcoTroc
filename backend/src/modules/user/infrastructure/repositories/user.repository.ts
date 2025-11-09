@@ -14,15 +14,27 @@ export class UserRepository implements IUserRepository {
   ) {}
 
   private toDomain(e: UserOrmEntity): User {
-    return new User(
-      e.id,
-      e.name,
-      e.email,
-      e.password,
-      e.role,
-      e.ecopointId,
-      e.pointsBalance,
-    );
+    return User.reconstitute({
+      id: e.id,
+      name: e.name,
+      email: e.email,
+      passwordHash: e.password,
+      role: e.role,
+      ecopointId: e.ecopointId,
+      pointsBalance: e.pointsBalance || 0,
+    });
+  }
+
+  private toOrm(user: User): Partial<UserOrmEntity> {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.passwordHash,
+      role: user.role,
+      ecopointId: user.ecopointId,
+      pointsBalance: user.pointsBalance,
+    };
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -36,12 +48,22 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(user: User): Promise<User> {
-    const e = this.repo.create({ ...user });
-    const saved = await this.repo.save(e);
+    const ormEntity = this.repo.create(this.toOrm(user));
+    const saved = await this.repo.save(ormEntity);
     return this.toDomain(saved);
   }
 
   async save(user: User): Promise<void> {
-    await this.repo.save({ ...user });
+    await this.repo.save(this.toOrm(user));
+  }
+
+  async findAll(): Promise<User[]> {
+    const entities = await this.repo.find();
+    return entities.map(e => this.toDomain(e));
+  }
+
+  async findByRole(role: RoleReference): Promise<User[]> {
+    const entities = await this.repo.find({ where: { role } });
+    return entities.map(e => this.toDomain(e));
   }
 }
