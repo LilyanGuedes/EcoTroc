@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-green-700">
+  <!-- Top Navigation - Fixed Header -->
+  <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3">
+      <div class="flex w-full justify-between items-center">
+        <button mat-icon-button routerLink="/recycler/home">
+          <mat-icon class="text-gray-700">arrow_back</mat-icon>
+        </button>
+        <img src="../../../assets/logo.png" alt="Logo EcoTroc" class="h-20" />
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-white">
+            {{ (currentUser$ | async)?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+        </button>
+      </div>
+    </div>
+    <mat-menu #userMenu="matMenu">
+      <div class="px-4 py-3 border-b bg-gray-50" *ngIf="currentUser$ | async as user">
+        <p class="font-semibold text-gray-800">{{ user.name }}</p>
+        <p class="text-sm text-gray-600">{{ user.email }}</p>
+        <p class="text-xs text-gray-500 mt-1">Reciclador</p>
+      </div>
+      <button mat-menu-item routerLink="/recycler/home">
+        <mat-icon class="text-green-600">home</mat-icon>
+        <span>Início</span>
+      </button>
+      <button mat-menu-item routerLink="/recycler/points">
+        <mat-icon class="text-amber-500">stars</mat-icon>
+        <span>Meus Pontos</span>
+      </button>
+      <button mat-menu-item routerLink="/recycler/redeem">
+        <mat-icon class="text-blue-600">redeem</mat-icon>
+        <span>Resgatar Pontos</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()" class="text-red-600">
+        <mat-icon class="text-red-600">logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </mat-menu>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Header with Total Points -->
+    <div class="mb-6">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl shadow-md p-6 text-center aspect-square flex flex-col items-center justify-center">
+          <img src="../../../../assets/approve.png" alt="" class="w-14 h-14" />
+          <p class="text-sm text-gray-600 mb-2">Pontos Confirmados</p>
+          <p class="text-4xl font-bold text-green-800">{{ totalPoints() }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 text-center aspect-square flex flex-col items-center justify-center">
+          <img src="../../../../assets/clock.png" alt="" class="w-14 h-14" />
+          <p class="text-sm text-gray-600 mb-2">Pontos Pendentes</p>
+          <p class="text-4xl font-bold text-yellow-800">{{ pendingPoints() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Collections -->
+<div class="bg-white rounded-3xl shadow-xl p-6 mb-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+    <h2 class="text-xl font-semibold text-gray-600">
+      Pendentes de Confirmação
+    </h2>
+    <span *ngIf="pendingCollections().length > 0"
+          class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-bold text-white bg-red-500 rounded-full">
+      {{ pendingCollections().length }}
+    </span>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="pendingCollections().length === 0" 
+       class="flex flex-col items-center justify-center py-16 text-gray-400">
+     <img src="../../../../assets/empty-folder.png" alt="" class="w-16 h-16 mb-4" />
+    <p class="text-lg font-medium">Nenhuma coleta pendente de confirmação</p>
+  </div>
+
+  <!-- Collections List -->
+  <div class="space-y-4">
+    <div *ngFor="let collection of pendingCollections()" 
+         class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
+      
+      <!-- Material Info -->
+      <div class="flex items-start gap-3 mb-4">
+        <div class="bg-green-500 rounded-xl p-3">
+          <mat-icon class="text-white">{{ getMaterialIcon(collection.materialType) }}</mat-icon>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold text-gray-800 mb-1">
+            {{ getMaterialLabel(collection.materialType) }}
+          </h3>
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+              {{ collection.quantity }} kg
+            </span>
+            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+              +{{ collection.points }} pontos
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="bg-white rounded-xl p-4 mb-4 space-y-2">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <mat-icon class="text-gray-400 scale-75">calendar_today</mat-icon>
+          <span>{{ collection.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div *ngIf="collection.description" class="flex items-start gap-2 text-sm text-gray-600">
+          <mat-icon class="text-gray-400 scale-75">description</mat-icon>
+          <span>{{ collection.description }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 pt-2">
+        <button (click)="respondToCollection(collection, true)"
+                [disabled]="loading()"
+                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+          <mat-icon>check_circle</mat-icon>
+          <span>Aceitar</span>
+        </button>
+        <button (click)="respondToCollection(collection, false)"
+                [disabled]="loading()"
+                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl">
+          <mat-icon>cancel</mat-icon>
+          <span>Contestar</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
