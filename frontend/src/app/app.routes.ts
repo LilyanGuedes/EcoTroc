@@ -14,10 +14,17 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'register-user',
+    path: 'register',
     loadComponent: () =>
       import('./modules/auth/register-user/register-user.component').then(
         (c) => c.RegisterUserComponent
+      ),
+  },
+  {
+    path: 'without-permission',
+    loadComponent: () =>
+      import('./modules/without-permission/without-permission.component').then(
+        (c) => c.WithoutPermissionComponent
       ),
   },
   {
