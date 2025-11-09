@@ -1,0 +1,69 @@
+<mat-toolbar color="primary" class="shadow-md">
+  <div class="container mx-auto flex items-center justify-between px-4">
+    <!-- Botão Voltar + Logo -->
+    <div class="flex items-center gap-3">
+      <button *ngIf="showBackButton()" mat-icon-button (click)="goBack()" class="text-white">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="flex items-center gap-2 cursor-pointer" [routerLink]="getHomeRoute()">
+        <mat-icon class="text-white text-3xl">eco</mat-icon>
+        <span class="text-xl font-bold text-white">EcoTroc</span>
+      </div>
+    </div>
+
+    <!-- Navegação -->
+    <div class="flex items-center gap-4">
+      <ng-container *ngIf="currentUser$ | async as user; else loginButton">
+        <!-- Avatar do Usuário -->
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-white">
+            {{ user.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+        </button>
+        <mat-menu #userMenu="matMenu" class="user-menu">
+          <div class="px-4 py-3 border-b bg-gray-50">
+            <p class="font-semibold text-gray-800">{{ user.name }}</p>
+            <p class="text-sm text-gray-600">{{ user.email }}</p>
+            <p class="text-xs text-gray-500 mt-1 capitalize">{{ user.role === RoleReference.RECYCLER ? 'Reciclador' : 'Eco-Operador' }}</p>
+          </div>
+          <button mat-menu-item [routerLink]="getHomeRoute()">
+            <mat-icon class="text-green-600">home</mat-icon>
+            <span>Início</span>
+          </button>
+          <ng-container *ngIf="user.role === RoleReference.RECYCLER">
+            <button mat-menu-item routerLink="/recycler/points">
+              <mat-icon class="text-amber-500">stars</mat-icon>
+              <span>Meus Pontos</span>
+            </button>
+            <button mat-menu-item routerLink="/recycler/redeem">
+              <mat-icon class="text-blue-600">redeem</mat-icon>
+              <span>Resgatar Pontos</span>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="user.role === RoleReference.ECOOPERATOR">
+            <button mat-menu-item routerLink="/operator/declare">
+              <mat-icon class="text-green-600">recycling</mat-icon>
+              <span>Declarar Reciclagem</span>
+            </button>
+            <button mat-menu-item routerLink="/operator/collections">
+              <mat-icon class="text-blue-600">pending_actions</mat-icon>
+              <span>Coletas</span>
+            </button>
+          </ng-container>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()" class="text-red-600">
+            <mat-icon class="text-red-600">logout</mat-icon>
+            <span>Sair</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+
+      <ng-template #loginButton>
+        <button mat-raised-button color="accent" routerLink="/login">
+          <mat-icon>login</mat-icon>
+          Entrar
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</mat-toolbar>
