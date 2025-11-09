@@ -1,0 +1,217 @@
+<div class="min-h-screen bg-white">
+  <!-- Header Grande com Gradiente Lilás -->
+  <div class="pb-8 print:hidden" style="background: linear-gradient(to bottom right, #4B3D6E, #342952)">
+    <!-- Top Navigation -->
+    <div class="px-4 py-3">
+      <div class="flex w-full justify-between items-center">
+        <button mat-icon-button (click)="goBack()">
+          <mat-icon class="text-white">arrow_back</mat-icon>
+        </button>
+        <img src="../../../assets/logo.png" alt="Logo EcoTroc" class="h-24" />
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+          <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold text-sm shadow-lg" style="color: #4B3D6E">
+            {{ (currentUser$ | async)?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+        </button>
+      </div>
+      <mat-menu #userMenu="matMenu">
+        <div class="px-4 py-3 border-b bg-gray-50" *ngIf="currentUser$ | async as user">
+          <p class="font-semibold text-gray-800">{{ user.name }}</p>
+          <p class="text-sm text-gray-600">{{ user.email }}</p>
+          <p class="text-xs text-gray-500 mt-1">Eco-Operador</p>
+        </div>
+        <button mat-menu-item routerLink="/operator/home">
+          <mat-icon class="text-green-600">home</mat-icon>
+          <span>Início</span>
+        </button>
+        <button mat-menu-item routerLink="/operator/declare">
+          <mat-icon class="text-green-600">recycling</mat-icon>
+          <span>Declarar Reciclagem</span>
+        </button>
+        <button mat-menu-item routerLink="/operator/collections">
+          <mat-icon class="text-blue-600">pending_actions</mat-icon>
+          <span>Coletas</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()" class="text-red-600">
+          <mat-icon class="text-red-600">logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
+    </div>
+
+    <!-- Título -->
+    <div class="px-6 mt-4 mb-8">
+      <h1 class="text-3xl font-bold text-white">Relatório de Coletas</h1>
+      <p class="text-sm text-white/90 mt-1">Visão geral do sistema de reciclagem</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="flex justify-center items-center py-20">
+    <div class="text-center">
+      <mat-icon class="text-green-600 !text-6xl animate-spin">refresh</mat-icon>
+      <p class="text-gray-600 mt-4">Carregando relatórios...</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading() && reportData()" class="px-4 pb-8 -mt-8">
+
+    <!-- Botão Imprimir -->
+    <div class="flex justify-end mb-4 print:hidden">
+      <button
+        mat-raised-button
+        (click)="printReport()"
+        class="!bg-green-600 hover:!bg-green-700 !text-white">
+        <mat-icon>print</mat-icon>
+        Imprimir Relatório
+      </button>
+    </div>
+
+    <!-- Resumo Geral -->
+    <div class="bg-white rounded-3xl shadow-lg p-6 mb-6 border-2 border-green-200">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <mat-icon class="text-green-600">assessment</mat-icon>
+        Resumo Geral
+      </h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-green-100 rounded-2xl p-4 text-center">
+          <mat-icon class="text-green-700 !text-4xl">inventory</mat-icon>
+          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.totalCollections }}</p>
+          <p class="text-sm text-green-700">Total de Coletas</p>
+        </div>
+
+        <div class="bg-blue-100 rounded-2xl p-4 text-center">
+          <mat-icon class="text-blue-700 !text-4xl">check_circle</mat-icon>
+          <p class="text-3xl font-bold text-blue-900 mt-2">{{ reportData().summary.acceptedCollections }}</p>
+          <p class="text-sm text-blue-700">Aceitas</p>
+        </div>
+
+        <div class="bg-amber-100 rounded-2xl p-4 text-center">
+          <mat-icon class="text-amber-700 !text-4xl">pending</mat-icon>
+          <p class="text-3xl font-bold text-amber-900 mt-2">{{ reportData().summary.pendingCollections }}</p>
+          <p class="text-sm text-amber-700">Pendentes</p>
+        </div>
+
+        <div class="bg-red-100 rounded-2xl p-4 text-center">
+          <mat-icon class="text-red-700 !text-4xl">cancel</mat-icon>
+          <p class="text-3xl font-bold text-red-900 mt-2">{{ reportData().summary.rejectedCollections }}</p>
+          <p class="text-sm text-red-700">Rejeitadas</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div class="bg-green-300 rounded-2xl p-4 text-center">
+          <mat-icon class="text-green-900 !text-4xl">scale</mat-icon>
+          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.totalQuantity }} kg</p>
+          <p class="text-sm text-green-800">Material Processado</p>
+        </div>
+
+        <div class="bg-green-300 rounded-2xl p-4 text-center">
+          <mat-icon class="text-green-900 !text-4xl">stars</mat-icon>
+          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.totalPoints }}</p>
+          <p class="text-sm text-green-800">Pontos Distribuídos</p>
+        </div>
+
+        <div class="bg-green-300 rounded-2xl p-4 text-center">
+          <mat-icon class="text-green-900 !text-4xl">calendar_today</mat-icon>
+          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.recentCollections }}</p>
+          <p class="text-sm text-green-800">Últimos 30 dias</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estatísticas por Material -->
+    <div class="bg-white rounded-3xl shadow-lg p-6 mb-6 border-2 border-green-200">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <mat-icon class="text-green-600">pie_chart</mat-icon>
+        Distribuição por Tipo de Material
+      </h2>
+
+      <div class="space-y-4">
+        <div *ngFor="let material of ['PLASTICO', 'PAPEL', 'VIDRO', 'METAL']"
+             class="bg-green-50 rounded-2xl p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-bold text-gray-800">{{ getMaterialLabel(material) }}</span>
+            <span class="text-sm text-gray-600">
+              {{ reportData().materialStats[material].quantity }} kg
+              ({{ getMaterialPercentage(material) }}%)
+            </span>
+          </div>
+          <div class="w-full bg-green-200 rounded-full h-4 overflow-hidden">
+            <div
+              class="bg-green-600 h-full rounded-full transition-all duration-500"
+              [style.width.%]="getMaterialPercentage(material)">
+            </div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-600 mt-2">
+            <span>{{ reportData().materialStats[material].count }} coletas</span>
+            <span>{{ reportData().materialStats[material].points }} pontos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listagem de Coletas Recentes -->
+    <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-green-200">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <mat-icon class="text-green-600">list</mat-icon>
+        Coletas Recentes (Últimas 10)
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-green-100">
+            <tr>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-green-900">Data</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-green-900">Material</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-green-900">Quantidade</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-green-900">Pontos</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-green-900">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let collection of reportData().collections.slice(0, 10); let i = index"
+                [class.bg-gray-50]="i % 2 === 0">
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ collection.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ getMaterialLabel(collection.materialType) }}
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ collection.quantity }} kg
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-700">
+                {{ collection.points }} pts
+              </td>
+              <td class="px-4 py-3 text-sm">
+                <span *ngIf="collection.status === 'accepted'"
+                      class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                  Aceita
+                </span>
+                <span *ngIf="collection.status === 'pending'"
+                      class="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
+                  Pendente
+                </span>
+                <span *ngIf="collection.status === 'rejected'"
+                      class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                  Rejeitada
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer do Relatório (apenas impressão) -->
+    <div class="hidden print:block mt-8 pt-4 border-t border-gray-300">
+      <p class="text-center text-sm text-gray-600">
+        Relatório gerado em {{ currentDate | date:'dd/MM/yyyy HH:mm' }} - EcoTroc Sistema de Reciclagem
+      </p>
+    </div>
+  </div>
+</div>
