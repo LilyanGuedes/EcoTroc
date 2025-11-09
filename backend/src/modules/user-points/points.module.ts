@@ -6,8 +6,20 @@ import { PointsController } from './interface/controllers/points.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserPointsOrmEntity])],
-  providers: [UserPointsRepository],
+  providers: [
+    UserPointsRepository,
+    {
+      provide: 'IUserPointsRepository',
+      useClass: UserPointsRepository,
+    },
+  ],
   controllers: [PointsController],
-  exports: [UserPointsRepository],
+  exports: [
+    UserPointsRepository,
+    {
+      provide: 'IUserPointsRepository',
+      useClass: UserPointsRepository,
+    },
+  ],
 })
 export class PointsModule {}
