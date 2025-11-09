@@ -1,46 +1,37 @@
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateCollectionDto } from '../dto/create-collection.dto';
 import { Collection } from '../../domain/entities/collection.entity';
 import { ICollectionRepository } from '../../domain/repositories/collection.repository.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { IUserPointsRepository } from 'src/modules/user-points/domain/repositories/user-points.repository.interface';
+import { UserPoints } from 'src/modules/user-points/domain/entities/user-points.entity';
 
+@Injectable()
 export class CreateCollectionUseCase {
   constructor(
+    @Inject('ICollectionRepository')
     private readonly collectionRepo: ICollectionRepository,
-    private readonly userPointsRepo: IUserPointsRepository, // will be injected from PointsModule
+    @Inject('IUserPointsRepository')
+    private readonly userPointsRepo: IUserPointsRepository,
   ) {}
 
   async execute(dto: CreateCollectionDto): Promise<void> {
-    const points = this.calculatePoints(dto.materialType, dto.quantity);
-    const id = uuidv4();
-    const collection = new Collection(
-      id,
-      dto.operatorId,
-      dto.recyclerNickname,
-      dto.materialType,
-      dto.quantity,
-      points,
-      new Date(),
-    );
+    // Entidade Collection agora calcula seus próprios pontos
+    const collection = Collection.create({
+      operatorId: dto.operatorId,
+      userId: dto.userId || dto.recyclerNickname || '',
+      materialType: dto.materialType,
+      quantity: dto.quantity,
+    });
+
     await this.collectionRepo.create(collection);
 
-    // Delegates to PointsModule
-    await this.userPointsRepo.create({
-      id: uuidv4(),
-      userId: dto.recyclerNickname,
-      collectionId: id,
-      points,
-      createdAt: new Date(),
+    // Criar transação de pontos
+    const pointsTransaction = UserPoints.createFromCollection({
+      userId: dto.userId || dto.recyclerNickname || '',
+      collectionId: collection.id,
+      points: collection.points,
     });
-  }
 
-  private calculatePoints(material: string, qty: number): number {
-    const base: Record<string, number> = {
-      PLASTICO: 10,
-      PAPEL: 5,
-      VIDRO: 8,
-      METAL: 12,
-    };
-    return (base[material.toUpperCase()] || 1) * qty;
+    await this.userPointsRepo.create(pointsTransaction);
   }
 }
