@@ -1,43 +1,123 @@
-<div
-  class="min-h-screen flex flex-col items-center bg-gradient-to-b from-green-300 to-green-50 p-2"
->
-  <div class="flex w-full justify-end p-4 h-auto">
-    <button><img class="h-10" src="../../../../assets/account.svg" alt="" /></button>
-  </div>
-  <img src="../../../assets/logo.png" alt="Logo" class="w-40 h-auto mt-10" />
-
-  <div class="flex flex-col items-center w-96 p-4 gap-8">
-    <div
-      class="bg-white rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-transform hover:-translate-y-1 h-20 w-full flex flex-col items-center justify-center p-2"
-    >
-      <a routerLink="botao.rota" class="w-full h-full">
-        <div
-          class="flex flex-col items-center justify-center gap-5 h-full text-center"
-        >
-          <h3 class="text-base font-semibold text-gray-500 mb-2">
-            Coletas
-          </h3>
+<div class="min-h-screen bg-white">
+  <!-- Header Grande com Gradiente Lilás -->
+  <div class="pb-8" style="background: linear-gradient(to bottom right, #4B3D6E, #342952)">
+    <!-- Top Navigation -->
+    <div class="px-4 py-3">
+      <div class="flex w-full justify-between items-center">
+        <button mat-icon-button (click)="goBack()">
+          <mat-icon class="text-white">arrow_back</mat-icon>
+        </button>
+        <img src="../../../assets/logo.png" alt="Logo EcoTroc" class="h-24" />
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+          <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold text-sm shadow-lg" style="color: #4B3D6E">
+            {{ (currentUser$ | async)?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+        </button>
+      </div>
+      <mat-menu #userMenu="matMenu">
+        <div class="px-4 py-3 border-b bg-gray-50" *ngIf="currentUser$ | async as user">
+          <p class="font-semibold text-gray-800">{{ user.name }}</p>
+          <p class="text-sm text-gray-600">{{ user.email }}</p>
+          <p class="text-xs text-gray-500 mt-1">Eco-Operador</p>
         </div>
-      </a>
+        <button mat-menu-item routerLink="/operator/home">
+          <mat-icon class="text-green-600">home</mat-icon>
+          <span>Início</span>
+        </button>
+        <button mat-menu-item routerLink="/operator/declare">
+          <mat-icon class="text-green-600">recycling</mat-icon>
+          <span>Declarar Reciclagem</span>
+        </button>
+        <button mat-menu-item routerLink="/operator/collections">
+          <mat-icon class="text-blue-600">pending_actions</mat-icon>
+          <span>Coletas</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()" class="text-red-600">
+          <mat-icon class="text-red-600">logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
     </div>
 
-    <div
-      class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full place-items-center"
-    >
+    <!-- Saudação -->
+    <div class="px-6 mt-4 mb-20">
+      <h1 class="text-2xl font-bold text-white">Olá, Eco-Operador!</h1>
+      <p class="text-sm text-white/90 mt-1" *ngIf="currentUser$ | async as user">{{ user.name }}</p>
+    </div>
+  </div>
+
+  <!-- Card de Resumo metade dentro/fora do Header -->
+  <div class="px-4 -mt-16 relative z-10 mb-6">
+    <div class="bg-green-300 rounded-3xl shadow-lg p-5">
+      <h3 class="text-sm font-semibold text-green-900 mb-3">Coletas:</h3>
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div>
+          <p class="text-xs text-green-800">Finalizadas</p>
+          <p class="text-lg font-bold text-green-900">{{ acceptedCount() }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-green-800">Agendadas</p>
+          <p class="text-lg font-bold text-green-900">{{ pendingCount() }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-green-800">Canceladas</p>
+          <p class="text-lg font-bold text-green-900">0</p>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-green-400">
+        <div class="flex justify-between text-sm">
+          <span class="text-green-800">Total processado:</span>
+          <span class="font-bold text-green-900">{{ totalQuantity() }} kg</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content com fundo branco -->
+  <div class="px-4 pb-6">
+    <!-- Cards de Funcionalidades -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
       <div
         *ngFor="let botao of botoes"
-        class="bg-white rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-transform hover:-translate-y-1 h-28 w-36 flex flex-col items-center justify-center p-2"
+        class="bg-green-300 rounded-3xl shadow-md overflow-hidden hover:shadow-lg transition-all hover:scale-105 p-4"
       >
-        <a routerLink="botao.rota" class="w-full h-full">
-          <div
-            class="flex flex-col items-center justify-center gap-2 h-full text-center"
-          >
-            <h3 class="text-base font-semibold text-gray-500 text-center">
+        <a [routerLink]="botao.rota" class="w-full h-full">
+          <div class="flex flex-col items-center justify-center gap-2 text-center">
+            <div class="bg-white/30 rounded-full p-3 mb-1">
+              <img *ngIf="botao.icone.includes('assets')" [src]="botao.icone" alt="" class="h-8 w-8 object-contain" />
+              <mat-icon *ngIf="!botao.icone.includes('assets')" class="text-green-900 !text-3xl">{{ botao.icone }}</mat-icon>
+            </div>
+            <h3 class="text-sm font-semibold text-green-900">
               {{ botao.nome }}
             </h3>
-            <img [src]="botao.icone" alt="" class="h-10 w-10 object-contain" />
           </div>
         </a>
+      </div>
+    </div>
+
+    <!-- Estatísticas por Material -->
+    <div class="mt-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Declarações por Material</h2>
+
+      <div *ngIf="declarationStats().length === 0" class="bg-green-100 rounded-3xl shadow-md p-6 text-center border-2 border-green-300">
+        <img src="../../../../assets/empty-folder.png" alt="" class="w-16 h-16 mx-auto mb-2 opacity-50" />
+        <p class="text-green-700 font-medium">Você ainda não tem declarações registradas</p>
+      </div>
+
+      <div *ngIf="declarationStats().length > 0" class="space-y-3">
+        <div *ngFor="let stat of declarationStats()" class="bg-green-300 rounded-3xl shadow-md p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-semibold text-green-900">{{ stat.material }}</span>
+            <span class="text-sm text-green-800 font-bold">{{ stat.total }} kg ({{ stat.percentage }}%)</span>
+          </div>
+          <div class="w-full bg-green-200 rounded-full h-3 overflow-hidden">
+            <div
+              class="bg-green-700 h-full rounded-full transition-all duration-500"
+              [style.width.%]="stat.percentage">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
