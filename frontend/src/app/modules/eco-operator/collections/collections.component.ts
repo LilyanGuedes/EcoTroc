@@ -6,8 +6,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { Router, RouterModule } from '@angular/router';
 import { CollectionService, Collection } from '../../../services/collection.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-operator-collections',
@@ -21,6 +24,8 @@ import { CollectionService, Collection } from '../../../services/collection.serv
     MatIconModule,
     MatChipsModule,
     MatSnackBarModule,
+    MatMenuModule,
+    MatDividerModule,
   ],
   templateUrl: './collections.component.html',
   styleUrl: './collections.component.css'
@@ -28,12 +33,16 @@ import { CollectionService, Collection } from '../../../services/collection.serv
 export class OperatorCollectionsComponent implements OnInit {
   collections = signal<Collection[]>([]);
   loading = signal(false);
+  currentUser$;
 
   constructor(
     private collectionService: CollectionService,
     private snackBar: MatSnackBar,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+  }
 
   ngOnInit() {
     this.loadCollections();
@@ -100,5 +109,9 @@ export class OperatorCollectionsComponent implements OnInit {
 
   declareNew() {
     this.router.navigate(['/operator/declare']);
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

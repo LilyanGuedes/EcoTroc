@@ -1,34 +1,86 @@
-<div class="min-h-screen bg-gradient-to-br from-emerald-400 via-green-400 to-teal-500 p-6">
+<div class="min-h-screen bg-white">
+  <!-- Header Grande com Gradiente Lilás -->
+  <div class="pb-8" style="background: linear-gradient(to bottom right, #4B3D6E, #342952)">
+    <!-- Top Navigation -->
+    <div class="px-4 py-3">
+      <div class="flex w-full justify-between items-center">
+        <button mat-icon-button (click)="goBack()">
+          <mat-icon class="text-white">arrow_back</mat-icon>
+        </button>
+        <img src="../../../assets/logo.png" alt="Logo EcoTroc" class="h-24" />
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+          <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold text-sm shadow-lg" style="color: #4B3D6E">
+            {{ (currentUser$ | async)?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+        </button>
+      </div>
+      <mat-menu #userMenu="matMenu">
+        <div class="px-4 py-3 border-b bg-gray-50" *ngIf="currentUser$ | async as user">
+          <p class="font-semibold text-gray-800">{{ user.name }}</p>
+          <p class="text-sm text-gray-600">{{ user.email }}</p>
+          <p class="text-xs text-gray-500 mt-1">Eco-Operador</p>
+        </div>
+        <button mat-menu-item routerLink="/operator/home">
+          <mat-icon class="text-green-600">home</mat-icon>
+          <span>Início</span>
+        </button>
+        <button mat-menu-item routerLink="/operator/declare">
+          <mat-icon class="text-green-600">recycling</mat-icon>
+          <span>Declarar Reciclagem</span>
+        </button>
+        <button mat-menu-item routerLink="/operator/collections">
+          <mat-icon class="text-blue-600">pending_actions</mat-icon>
+          <span>Coletas</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()" class="text-red-600">
+          <mat-icon class="text-red-600">logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
+    </div>
 
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-8">
-    <button (click)="goBack()" mat-icon-button class="!bg-white/20 !text-white hover:!bg-white/30">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1 class="text-2xl font-bold text-white">Coletas Declaradas</h1>
-    <button (click)="declareNew()" mat-icon-button class="!bg-white/20 !text-white hover:!bg-white/30">
-      <mat-icon>add</mat-icon>
-    </button>
+    <!-- Título -->
+    <div class="px-6 mt-4 mb-8">
+      <h1 class="text-3xl font-bold text-white">Coletas Declaradas</h1>
+      <p class="text-sm text-white/90 mt-1">Gerenciar suas declarações de reciclagem</p>
+    </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading()" class="flex justify-center items-center py-12">
-    <mat-icon class="animate-spin text-white text-5xl">refresh</mat-icon>
-  </div>
+  <!-- Content -->
+  <div class="px-4 pb-8 -mt-4">
 
-  <!-- Empty State -->
-  <div *ngIf="!loading() && collections().length === 0" class="text-center py-12">
-    <mat-icon class="text-white text-6xl mb-4">inventory_2</mat-icon>
-    <p class="text-white text-lg mb-4">Nenhuma coleta declarada ainda</p>
-    <button mat-raised-button color="accent" (click)="declareNew()">
-      <mat-icon>add</mat-icon>
-      Declarar Reciclagem
-    </button>
-  </div>
+    <!-- Botão Adicionar -->
+    <div class="flex justify-end mb-4">
+      <button
+        mat-raised-button
+        (click)="declareNew()"
+        class="!bg-green-600 hover:!bg-green-700 !text-white">
+        <mat-icon>add</mat-icon>
+        Declarar Reciclagem
+      </button>
+    </div>
 
-  <!-- Collections List -->
-  <div class="grid gap-4 max-w-4xl mx-auto">
-    <mat-card *ngFor="let collection of collections()" class="!bg-white/95">
+    <!-- Loading -->
+    <div *ngIf="loading()" class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <mat-icon class="text-green-600 !text-6xl animate-spin">refresh</mat-icon>
+        <p class="text-gray-600 mt-4">Carregando coletas...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && collections().length === 0" class="bg-white rounded-3xl shadow-lg p-12 text-center border-2 border-green-200">
+      <p class="text-gray-700 text-lg mb-4">Nenhuma coleta declarada ainda</p>
+      <button mat-raised-button class="!bg-green-600 !text-white" (click)="declareNew()">
+        <mat-icon>add</mat-icon>
+        Declarar Reciclagem
+      </button>
+    </div>
+
+    <!-- Collections List -->
+    <div *ngIf="!loading() && collections().length > 0" class="grid gap-4 max-w-4xl mx-auto">
+      <mat-card *ngFor="let collection of collections()" class="!bg-white !shadow-lg !rounded-3xl !border-2 !border-green-200">
       <mat-card-header>
         <mat-icon mat-card-avatar [class]="'!bg-green-500 !text-white'">
           {{ getMaterialIcon(collection.materialType) }}
@@ -61,6 +113,7 @@
           </div>
         </div>
       </mat-card-content>
-    </mat-card>
+      </mat-card>
+    </div>
   </div>
 </div>
