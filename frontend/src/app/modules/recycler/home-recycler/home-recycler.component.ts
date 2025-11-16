@@ -51,6 +51,34 @@ export class HomeRecyclerComponent implements OnInit {
     },
   ];
 
+  dicas = [
+    {
+      titulo: 'Separe corretamente!',
+      descricao: 'Lave e seque embalagens antes de descartar. Isso facilita a reciclagem e evita contaminação.',
+      imagem: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&h=300&fit=crop'
+    },
+    {
+      titulo: 'Plástico reciclável',
+      descricao: 'Nem todo plástico é reciclável. Verifique o símbolo de reciclagem e separe corretamente.',
+      imagem: 'https://images.unsplash.com/photo-1528323273322-d81458248d40?w=400&h=300&fit=crop'
+    },
+    {
+      titulo: 'Papel e papelão',
+      descricao: 'Mantenha o papel seco e limpo. Papéis engordurados ou molhados não são recicláveis.',
+      imagem: 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=400&h=300&fit=crop'
+    },
+    {
+      titulo: 'Vidro reutilizável',
+      descricao: 'O vidro pode ser reciclado infinitas vezes sem perder qualidade. Separe por cor quando possível.',
+      imagem: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=300&fit=crop'
+    },
+    {
+      titulo: 'Metal vale pontos!',
+      descricao: 'Latas de alumínio e outros metais são altamente valorizados na reciclagem. Amasse para economizar espaço.',
+      imagem: 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=400&h=300&fit=crop'
+    }
+  ];
+
   constructor(
     private authService: AuthService,
     private location: Location,
