@@ -78,47 +78,40 @@
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-green-100 rounded-2xl p-4 text-center">
-          <mat-icon class="text-green-700 !text-4xl">inventory</mat-icon>
-          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.totalCollections }}</p>
-          <p class="text-sm text-green-700">Total de Coletas</p>
+          <p class="text-3xl font-bold text-green-900">{{ reportData().summary.totalCollections }}</p>
+          <p class="text-sm text-green-700 mt-1">Total de Coletas</p>
         </div>
 
         <div class="bg-blue-100 rounded-2xl p-4 text-center">
-          <mat-icon class="text-blue-700 !text-4xl">check_circle</mat-icon>
-          <p class="text-3xl font-bold text-blue-900 mt-2">{{ reportData().summary.acceptedCollections }}</p>
-          <p class="text-sm text-blue-700">Aceitas</p>
+          <p class="text-3xl font-bold text-blue-900">{{ reportData().summary.acceptedCollections }}</p>
+          <p class="text-sm text-blue-700 mt-1">Aceitas</p>
         </div>
 
         <div class="bg-amber-100 rounded-2xl p-4 text-center">
-          <mat-icon class="text-amber-700 !text-4xl">pending</mat-icon>
-          <p class="text-3xl font-bold text-amber-900 mt-2">{{ reportData().summary.pendingCollections }}</p>
-          <p class="text-sm text-amber-700">Pendentes</p>
+          <p class="text-3xl font-bold text-amber-900">{{ reportData().summary.pendingCollections }}</p>
+          <p class="text-sm text-amber-700 mt-1">Pendentes</p>
         </div>
 
         <div class="bg-red-100 rounded-2xl p-4 text-center">
-          <mat-icon class="text-red-700 !text-4xl">cancel</mat-icon>
-          <p class="text-3xl font-bold text-red-900 mt-2">{{ reportData().summary.rejectedCollections }}</p>
-          <p class="text-sm text-red-700">Rejeitadas</p>
+          <p class="text-3xl font-bold text-red-900">{{ reportData().summary.rejectedCollections }}</p>
+          <p class="text-sm text-red-700 mt-1">Rejeitadas</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <div class="bg-green-300 rounded-2xl p-4 text-center">
-          <mat-icon class="text-green-900 !text-4xl">scale</mat-icon>
-          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.totalQuantity }} kg</p>
-          <p class="text-sm text-green-800">Material Processado</p>
+          <p class="text-3xl font-bold text-green-900">{{ reportData().summary.totalQuantity }} kg</p>
+          <p class="text-sm text-green-800 mt-1">Material Processado</p>
         </div>
 
         <div class="bg-green-300 rounded-2xl p-4 text-center">
-          <mat-icon class="text-green-900 !text-4xl">stars</mat-icon>
-          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.totalPoints }}</p>
-          <p class="text-sm text-green-800">Pontos Distribuídos</p>
+          <p class="text-3xl font-bold text-green-900">{{ reportData().summary.totalPoints }}</p>
+          <p class="text-sm text-green-800 mt-1">Pontos Distribuídos</p>
         </div>
 
         <div class="bg-green-300 rounded-2xl p-4 text-center">
-          <mat-icon class="text-green-900 !text-4xl">calendar_today</mat-icon>
-          <p class="text-3xl font-bold text-green-900 mt-2">{{ reportData().summary.recentCollections }}</p>
-          <p class="text-sm text-green-800">Últimos 30 dias</p>
+          <p class="text-3xl font-bold text-green-900">{{ reportData().summary.recentCollections }}</p>
+          <p class="text-sm text-green-800 mt-1">Últimos 30 dias</p>
         </div>
       </div>
     </div>
