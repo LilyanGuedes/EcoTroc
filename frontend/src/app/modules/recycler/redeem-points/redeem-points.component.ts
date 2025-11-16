@@ -7,6 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
@@ -26,12 +28,15 @@ import { environment } from '../../../../environments/environment';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    MatMenuModule,
+    MatDividerModule,
     MatSnackBarModule,
   ],
   templateUrl: './redeem-points.component.html',
   styleUrl: './redeem-points.component.css'
 })
 export class RedeemPointsComponent implements OnInit {
+  currentUser$;
   totalPoints = signal(0);
   loading = signal(false);
 
@@ -52,7 +57,9 @@ export class RedeemPointsComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.currentUser$ = this.authService.currentUser$;
+  }
 
   ngOnInit() {
     this.loadTotalPoints();
@@ -130,5 +137,9 @@ export class RedeemPointsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/recycler/home']);
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

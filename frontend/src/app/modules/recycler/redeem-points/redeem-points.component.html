@@ -1,18 +1,60 @@
-<div class="min-h-screen flex items-center justify-center bg-green-700 py-12 px-4 sm:px-6 lg:px-8">
-  <mat-card class="max-w-lg w-full space-y-8 p-8">
-    <mat-card-header class="text-center">
-      <mat-card-title class="text-3xl font-bold text-gray-900">Resgatar Pontos</mat-card-title>
-      <mat-card-subtitle class="text-lg text-gray-600 mt-2">
-        Troque seus pontos por benefícios
-      </mat-card-subtitle>
-    </mat-card-header>
+<div class="min-h-screen bg-white">
+  <!-- Header Grande com Gradiente Lilás -->
+  <div class="pb-8" style="background: linear-gradient(to bottom right, #4B3D6E, #342952)">
+    <!-- Top Navigation -->
+    <div class="px-4 py-3">
+      <div class="flex w-full justify-between items-center">
+        <button mat-icon-button (click)="goBack()">
+          <mat-icon class="text-white">arrow_back</mat-icon>
+        </button>
+        <img src="../../../assets/logo.png" alt="Logo EcoTroc" class="h-24" />
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="!w-12 !h-12">
+          <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center font-bold text-sm shadow-lg" style="color: #4B3D6E">
+            {{ (currentUser$ | async)?.name?.charAt(0)?.toUpperCase() || 'U' }}
+          </div>
+        </button>
+      </div>
+      <mat-menu #userMenu="matMenu">
+        <div class="px-4 py-3 border-b bg-gray-50" *ngIf="currentUser$ | async as user">
+          <p class="font-semibold text-gray-800">{{ user.name }}</p>
+          <p class="text-sm text-gray-600">{{ user.email }}</p>
+          <p class="text-xs text-gray-500 mt-1">Reciclador</p>
+        </div>
+        <button mat-menu-item routerLink="/recycler/home">
+          <mat-icon class="text-green-600">home</mat-icon>
+          <span>Início</span>
+        </button>
+        <button mat-menu-item routerLink="/recycler/points">
+          <mat-icon class="text-amber-500">stars</mat-icon>
+          <span>Meus Pontos</span>
+        </button>
+        <button mat-menu-item routerLink="/recycler/redeem">
+          <mat-icon class="text-blue-600">redeem</mat-icon>
+          <span>Resgatar Pontos</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()" class="text-red-600">
+          <mat-icon class="text-red-600">logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
+    </div>
 
-    <mat-card-content>
+    <!-- Título -->
+    <div class="px-6 mt-4 mb-8">
+      <h1 class="text-3xl font-bold text-white">Resgatar Pontos</h1>
+      <p class="text-sm text-white/90 mt-1">Troque seus pontos por benefícios</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-lg mx-auto px-4 pb-6 -mt-4">
+    <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-green-200">
       <!-- Saldo de Pontos -->
-      <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl p-6 mb-6 text-white text-center shadow-lg">
-        <p class="text-sm opacity-90 mb-2">Seu saldo disponível</p>
-        <h2 class="text-5xl font-bold">{{ totalPoints() }}</h2>
-        <p class="text-lg mt-1">pontos</p>
+      <div class="bg-green-200 rounded-2xl p-6 mb-6 text-center shadow-lg">
+        <p class="text-sm text-green-800 mb-2">Seu saldo disponível</p>
+        <h2 class="text-5xl font-bold text-green-900">{{ totalPoints() }}</h2>
+        <p class="text-lg text-green-800 mt-1">pontos</p>
       </div>
 
       <!-- Formulário de Resgate -->
@@ -55,14 +97,9 @@
 
         <!-- Botões -->
         <div class="flex gap-4 mt-6">
-          <button mat-raised-button type="button" (click)="goBack()"
-                  class="flex-1 !bg-gray-200 hover:!bg-gray-300">
-            <mat-icon>arrow_back</mat-icon>
-            Voltar
-          </button>
           <button mat-raised-button color="primary" type="submit"
                   [disabled]="formGroup.invalid || loading() || totalPoints() === 0"
-                  class="flex-1">
+                  class="w-full !bg-green-600 hover:!bg-green-700 !text-white">
             <mat-icon>redeem</mat-icon>
             {{ loading() ? 'Resgatando...' : 'Resgatar Pontos' }}
           </button>
@@ -75,6 +112,6 @@
         <p class="text-yellow-800 font-medium">Você não possui pontos disponíveis para resgate</p>
         <p class="text-yellow-600 text-sm mt-1">Participe de coletas de reciclagem para ganhar pontos!</p>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

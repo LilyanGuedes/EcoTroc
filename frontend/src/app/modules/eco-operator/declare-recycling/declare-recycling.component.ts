@@ -156,8 +156,13 @@ export class DeclareRecyclingComponent {
   }
 
   async submit() {
+    console.log('Submit called');
+    console.log('Form valid:', this.formGroup.valid);
+    console.log('Form value:', this.formGroup.value);
+
     if (this.formGroup.invalid) {
       this.formGroup.markAllAsTouched();
+      console.error('Form invalid. Errors:', this.getFormErrors());
       this.snackBar.open('Preencha todos os campos obrigatórios', 'OK', {
         duration: 3000,
       });
@@ -167,16 +172,22 @@ export class DeclareRecyclingComponent {
     if (this.loading()) return;
     this.loading.set(true);
 
+    const currentUser = this.authService.getCurrentUser();
+    console.log('Current user:', currentUser);
+
     const declarationData = {
       userId: this.formGroup.value.userId!,
       materialType: this.formGroup.value.materialType!,
       quantity: this.formGroup.value.quantity!,
       description: this.formGroup.value.description || '',
-      operatorId: this.authService.getCurrentUser()?.id,
+      operatorId: currentUser?.id,
     };
+
+    console.log('Sending declaration data:', declarationData);
 
     this.collectionService.declareRecycling(declarationData).subscribe({
       next: (response) => {
+        console.log('Success response:', response);
         this.snackBar.open(response.message || 'Reciclagem declarada com sucesso!', 'OK', {
           duration: 3000,
         });
@@ -185,7 +196,13 @@ export class DeclareRecyclingComponent {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error(error);
+        console.error('Error response:', error);
+        console.error('Error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.error?.message,
+          error: error.error
+        });
         const message =
           error.error?.message ||
           'Erro ao declarar reciclagem. Verifique o ID do usuário.';
@@ -195,6 +212,17 @@ export class DeclareRecyclingComponent {
         this.loading.set(false);
       },
     });
+  }
+
+  getFormErrors(): any {
+    const errors: any = {};
+    Object.keys(this.formGroup.controls).forEach(key => {
+      const control = this.formGroup.get(key);
+      if (control && control.errors) {
+        errors[key] = control.errors;
+      }
+    });
+    return errors;
   }
 
   goBack() {
