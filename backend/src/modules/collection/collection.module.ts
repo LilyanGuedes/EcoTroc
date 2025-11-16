@@ -14,9 +14,11 @@ import { DomainEventPublisher } from 'src/shared/domain/domain-event-publisher';
 import { CollectionAcceptedHandler } from './application/event-handlers/collection-accepted.handler';
 import { CollectionRejectedHandler } from './application/event-handlers/collection-rejected.handler';
 import { UnitOfWork } from 'src/shared/infrastructure/unit-of-work';
+import { ReportsService } from './application/services/reports.service';
+import { GpuModule } from 'src/gpu/gpu.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CollectionOrmEntity]), PointsModule, UserModule],
+  imports: [TypeOrmModule.forFeature([CollectionOrmEntity]), PointsModule, UserModule, GpuModule],
   controllers: [CollectionController],
   providers: [
     // Repositories
@@ -30,6 +32,8 @@ import { UnitOfWork } from 'src/shared/infrastructure/unit-of-work';
     DeclareRecyclingUseCase,
     RespondToCollectionUseCase,
     GetPendingCollectionsUseCase,
+    // Application Services
+    ReportsService,
     // Domain Services
     CollectionDomainService,
     // Event Infrastructure

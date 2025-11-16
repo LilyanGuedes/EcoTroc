@@ -9,6 +9,7 @@ import { RoleReference } from 'src/shared/domain/role-reference.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { ICollectionRepository } from '../../domain/repositories/collection.repository.interface';
+import { ReportsService } from '../../application/services/reports.service';
 
 @Controller('collections')
 export class CollectionController {
@@ -17,6 +18,7 @@ export class CollectionController {
     private readonly declareRecyclingUseCase: DeclareRecyclingUseCase,
     private readonly respondToCollectionUseCase: RespondToCollectionUseCase,
     private readonly getPendingCollectionsUseCase: GetPendingCollectionsUseCase,
+    private readonly reportsService: ReportsService,
     @Inject('ICollectionRepository')
     private readonly collectionRepository: ICollectionRepository,
   ) {}
@@ -71,60 +73,17 @@ export class CollectionController {
   async getReports(@Request() req): Promise<any> {
     const collections = await this.collectionRepository.findAll();
 
-    // Estatísticas gerais
-    const totalCollections = collections.length;
-    const acceptedCollections = collections.filter(c => c.status === 'accepted').length;
-    const pendingCollections = collections.filter(c => c.status === 'pending').length;
-    const rejectedCollections = collections.filter(c => c.status === 'rejected').length;
+    // Usar ReportsService com aceleração GPU automática
+    return await this.reportsService.generateCollectionsReport(collections);
+  }
 
-    // Total de material processado
-    const totalQuantity = collections
-      .filter(c => c.status === 'accepted')
-      .reduce((sum, c) => sum + c.quantity, 0);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RoleReference.ECOOPERATOR)
+  @Get('reports/environmental-impact')
+  async getEnvironmentalImpact(@Request() req): Promise<any> {
+    const collections = await this.collectionRepository.findAll();
 
-    // Total de pontos distribuídos
-    const totalPoints = collections
-      .filter(c => c.status === 'accepted')
-      .reduce((sum, c) => sum + c.points, 0);
-
-    // Estatísticas por tipo de material
-    const materialStats = {
-      PLASTICO: { quantity: 0, points: 0, count: 0 },
-      PAPEL: { quantity: 0, points: 0, count: 0 },
-      VIDRO: { quantity: 0, points: 0, count: 0 },
-      METAL: { quantity: 0, points: 0, count: 0 },
-    };
-
-    collections
-      .filter(c => c.status === 'accepted')
-      .forEach(c => {
-        if (materialStats[c.materialType]) {
-          materialStats[c.materialType].quantity += c.quantity;
-          materialStats[c.materialType].points += c.points;
-          materialStats[c.materialType].count += 1;
-        }
-      });
-
-    // Estatísticas por período (últimos 30 dias)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const recentCollections = collections.filter(c =>
-      new Date(c.createdAt) >= thirtyDaysAgo
-    ).length;
-
-    return {
-      summary: {
-        totalCollections,
-        acceptedCollections,
-        pendingCollections,
-        rejectedCollections,
-        totalQuantity: Math.round(totalQuantity * 100) / 100,
-        totalPoints,
-        recentCollections,
-      },
-      materialStats,
-      collections: collections.map(c => c.toJSON()),
-    };
+    // Calcular impacto ambiental usando GPU para grandes volumes
+    return await this.reportsService.calculateEnvironmentalImpact(collections);
   }
 }

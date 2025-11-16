@@ -15,6 +15,7 @@ const user_module_1 = require("./modules/user/user.module");
 const dotenv_1 = require("dotenv");
 const auth_module_1 = require("./modules/auth/auth.module");
 const collection_module_1 = require("./modules/collection/collection.module");
+const gpu_module_1 = require("./gpu/gpu.module");
 (0, dotenv_1.config)();
 let AppModule = class AppModule {
 };
@@ -25,16 +26,17 @@ exports.AppModule = AppModule = __decorate([
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
                 host: process.env.DB_HOST,
-                port: +(process.env.DB_PORT || '5432'),
-                username: process.env.DB_USER,
-                password: process.env.DB_PASS,
-                database: process.env.DB_NAME,
+                port: 5432,
+                username: 'postgres',
+                password: '123',
+                database: 'ecotroc',
                 entities: [__dirname + '/**/*.orm-entity.{ts,js}'],
                 synchronize: true,
             }),
             user_module_1.UserModule,
             auth_module_1.AuthModule,
             collection_module_1.CollectionModule,
+            gpu_module_1.GpuModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
