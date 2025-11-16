@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ng generate component:*)"
-    ],
-    "deny": [],
-    "ask": []
-  }
-}
