@@ -13,8 +13,7 @@
 9. [Banco de Dados](#banco-de-dados)
 10. [Segurança](#segurança)
 11. [Fluxos Principais](#fluxos-principais)
-12. [Configuração e Deploy](#configuração-e-deploy)
-13. [Guia de Desenvolvimento](#guia-de-desenvolvimento)
+12. [Guia de Desenvolvimento](#guia-de-desenvolvimento)
 
 ---
 
